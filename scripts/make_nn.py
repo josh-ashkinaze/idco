@@ -56,11 +56,11 @@ def main():
     for sub, comments in comments_by_sub.items():
         logging.info(f'Training Word2Vec model for r/{sub}, which is {sub_counter} of {n_subs}...')
         model = train_word2vec_model(comments)
-        model.save(f'../../data/models/w2v_{sub}.model')
+        model.save(f'../data/models/w2v_{sub}.model')
         logging.info(f'Model for r/{sub} saved.')
         logging.info(f'Getting tfidf scores for r/{sub}, which is {sub_counter} of {n_subs}...')
         tfidf_dict = calculate_tfidf(comments)
-        with open(f'../../data/tfidf/tfidf_{sub}.json', 'w') as outfile:
+        with open(f'../data/tfidf/tfidf_{sub}.json', 'w') as outfile:
             json.dump(tfidf_dict, outfile)
         logging.info(f'tfidf for r/{sub} saved.')
         sub_counter +=1
