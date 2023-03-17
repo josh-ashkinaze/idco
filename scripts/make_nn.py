@@ -11,18 +11,6 @@ import json
 from gensim.models import Word2Vec
 import os
 import logging
-from nltk.corpus import brown
-from nltk.stem import WordNetLemmatizer
-import nltk
-from sklearn.feature_extraction.text import TfidfVectorizer
-import numpy as np
-from wordfreq import word_frequency
-
-
-nltk.download('wordnet')
-
-
-
 from wordfreq import word_frequency
 
 def calculate_tfidf(sub_comments):
