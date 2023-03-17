@@ -2,7 +2,9 @@
 Author: Joshua Ashkinaze
 Date: 03/17/2023
 
-Description: This script trains a Word2Vec model for each subreddit in the dataset. It outputs the models to the models directory.
+Description:
+* This script trains the Word2Vec model and calculates the tf-idf scores for each subreddit.
+* It outputs the models and tf-idf scores to the models and tfidf folders, respectively.
 """
 
 import json
@@ -14,28 +16,35 @@ from nltk.stem import WordNetLemmatizer
 import nltk
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
+from wordfreq import word_frequency
 
-nltk.download('brown')
+
 nltk.download('wordnet')
 
 
-def preprocess_brown_corpus():
-    lemmatizer = WordNetLemmatizer()
-    brown_lemmatized_words = [lemmatizer.lemmatize(word.lower()) for word in brown.words()]
-    brown_corpus = ' '.join(brown_lemmatized_words)
-    return brown_corpus
 
+from wordfreq import word_frequency
 
-def calculate_tfidf(sub_comments, brown_corpus):
-    vectorizer = TfidfVectorizer()
-    # Fit the vectorizer on the Brown corpus
-    vectorizer.fit([brown_corpus])
+def calculate_tfidf(sub_comments):
+    # Calculate term frequencies in the subreddit corpus
+    term_frequencies = {}
+    total_words = 0
+    for comment in sub_comments:
+        for word in comment:
+            term_frequencies[word] = term_frequencies.get(word, 0) + 1
+            total_words += 1
 
-    # Transform the subreddit comments using the fitted vectorizer
-    tfidf_matrix = vectorizer.transform([' '.join(comment) for comment in sub_comments])
-    feature_names = vectorizer.get_feature_names()
-    tfidf_dict = dict(zip(feature_names, np.mean(tfidf_matrix, axis=0).tolist()[0]))
+    # Calculate tf-idf scores
+    tfidf_dict = {}
+    for word, count in term_frequencies.items():
+        tf = count / total_words
+        word_freq = word_frequency(word, 'en', wordlist='best', minimum=0.0)
+        idf = 1 / word_freq if word_freq > 0 else 1
+        tfidf = tf * idf
+        tfidf_dict[word] = tfidf
+
     return tfidf_dict
+
 
 def train_word2vec_model(comments, size=100, window=5, min_count=5, workers=4, sg=1):
     model = Word2Vec(comments, vector_size=size, window=window, min_count=min_count, workers=workers, sg=sg)
@@ -44,7 +53,6 @@ def train_word2vec_model(comments, size=100, window=5, min_count=5, workers=4, s
 def main():
     log_file = os.path.splitext(os.path.basename(__file__))[0] + '.log'
     logging.basicConfig(filename=log_file, level=logging.INFO, filemode='w', format='%(asctime)s %(message)s')
-    brown_corpus = preprocess_brown_corpus()
 
     with open('../../data/processed_comments.json', 'r') as infile:
         comments_by_sub = json.load(infile)
@@ -63,7 +71,7 @@ def main():
         model.save(f'../../data/models/w2v_{sub}.model')
         logging.info(f'Model for r/{sub} saved.')
         logging.info(f'Getting tfidf scores for r/{sub}, which is {sub_counter} of {n_subs}...')
-        tfidf_dict = calculate_tfidf(comments, brown_corpus)
+        tfidf_dict = calculate_tfidf(comments)
         with open(f'../../data/tfidf/tfidf_{sub}.json', 'w') as outfile:
             json.dump(tfidf_dict, outfile)
         logging.info(f'tfidf for r/{sub} saved.')
