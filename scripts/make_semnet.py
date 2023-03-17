@@ -5,9 +5,7 @@ Date: 03/17/2023
 Description: Creates graphs from w2v models
 """
 
-
 import json
-import numpy as np
 import os
 from gensim.models import Word2Vec
 from sklearn.metrics.pairwise import cosine_similarity
@@ -23,6 +21,7 @@ def load_word2vec(subreddit):
         return None
 
 def cosine_similarity_matrix(model):
+    """Creates a matrix of cosine similarities between all words in the model"""
     word_vectors = [model.wv[word] for word in model.wv.index_to_key]
     if len(word_vectors) < 2:
         return None
@@ -30,6 +29,7 @@ def cosine_similarity_matrix(model):
     return sim_matrix
 
 def create_graph(words, sim_matrix):
+    """Creates a graph from a list of words and a matrix of cosine similarities"""
     G = nx.Graph()
     for i in range(len(words)):
         G.add_node(words[i])
@@ -38,6 +38,12 @@ def create_graph(words, sim_matrix):
             if similarity > 0:
                 G.add_edge(words[i], words[j], weight=similarity)
     return G
+
+def subgraph_by_edge_weight(G, threshold):
+    """Returns a subgraph of G that only contains edges with weight above threshold"""
+    subgraph_edges = [(u, v, w) for u, v, w in G.edges(data=True) if w['weight'] >= threshold]
+    subgraph = G.edge_subgraph(subgraph_edges)
+    return subgraph
 
 def main():
     log_file = os.path.splitext(os.path.basename(__file__))[0] + '.log'
@@ -59,6 +65,10 @@ def main():
                 G = create_graph(words, sim_matrix)
                 nx.write_gpickle(G, f'../data/semnets/semnet_{subreddit}.gpickle')
                 logging.info(f"Graph for subreddit {subreddit} saved")
+                logging.info(f"Making subgraph with 0.25 for {subreddit} saved")
+                sub = subgraph_by_edge_weight(G, 0.25)
+                nx.write_gpickle(G, f'../data/semnets/semnet_25_{subreddit}.gpickle')
+
     logging.info("Done")
 if __name__ == '__main__':
     main()
