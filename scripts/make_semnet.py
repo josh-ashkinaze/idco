@@ -1,3 +1,11 @@
+"""
+Author: Joshua Ashkinaze
+Date: 03/17/2023
+
+Description: Creates graphs from w2v models
+"""
+
+
 import json
 import numpy as np
 import os
@@ -42,7 +50,7 @@ def main():
         subreddits = json.load(infile)
 
     for subreddit in subreddits:
-        print(f"Processing subreddit {subreddit}...")
+        logging.info(f"Processing subreddit {subreddit}...")
         model = load_word2vec(subreddit)
         if model is not None:
             words = model.wv.index_to_key
@@ -50,7 +58,7 @@ def main():
             if sim_matrix is not None:
                 G = create_graph(words, sim_matrix)
                 nx.write_gpickle(G, f'../data/semnets/semnet_{subreddit}.gpickle')
-                print(f"Graph for subreddit {subreddit} saved")
-
+                logging.info(f"Graph for subreddit {subreddit} saved")
+    logging.info("Done")
 if __name__ == '__main__':
     main()
