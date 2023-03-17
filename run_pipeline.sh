@@ -22,7 +22,10 @@ echo "Running preprocess_comments.py..."
 python3 preprocess_comments.py
 
 # Train w2v
-cd ../nn
-python3 train_nn_.py
+cd ../
+echo "Training w2v..."
+python3 make_nn.py
+echo "Making semnets..."
+python3 make_semnet.py
 
 echo "Pipeline complete."

@@ -54,14 +54,14 @@ def main():
     log_file = os.path.splitext(os.path.basename(__file__))[0] + '.log'
     logging.basicConfig(filename=log_file, level=logging.INFO, filemode='w', format='%(asctime)s %(message)s')
 
-    with open('../../data/processed_comments.json', 'r') as infile:
+    with open('../data/processed_comments.json', 'r') as infile:
         comments_by_sub = json.load(infile)
 
-    if not os.path.exists('../../data/models'):
-        os.makedirs('../../data/models')
+    if not os.path.exists('../data/models'):
+        os.makedirs('../data/models')
 
-    if not os.path.exists('../../data/models'):
-        os.makedirs('../../data/tfidf')
+    if not os.path.exists('../data/tfidf'):
+        os.makedirs('../data/tfidf')
 
     n_subs = len(comments_by_sub)
     sub_counter = 0
