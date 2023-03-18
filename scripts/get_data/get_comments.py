@@ -1,3 +1,9 @@
+"""
+Author: Joshua Ashkinaze
+Date: 03/17/2023
+
+Description: This script gets the comments from a subreddit using the Pushshift API. It outputs the comments to a json file.
+"""
 import requests
 import time
 import os

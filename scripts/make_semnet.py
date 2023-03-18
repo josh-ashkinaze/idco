@@ -39,11 +39,13 @@ def create_graph(words, sim_matrix):
                 G.add_edge(words[i], words[j], weight=similarity)
     return G
 
+
 def subgraph_by_edge_weight(G, threshold):
     """Returns a subgraph of G that only contains edges with weight above threshold"""
-    subgraph_edges = [(u, v, w) for u, v, w in G.edges(data=True) if w['weight'] >= threshold]
+    subgraph_edges = [(u, v) for u, v, w in G.edges(data=True) if w['weight'] >= threshold]
     subgraph = G.edge_subgraph(subgraph_edges)
     return subgraph
+
 
 def main():
     log_file = os.path.splitext(os.path.basename(__file__))[0] + '.log'

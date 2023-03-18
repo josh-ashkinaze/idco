@@ -73,7 +73,6 @@ def preprocess_comment(comment):
         logging.info('Error preprocessing comment: {}'.format(e))
         return None
 
-
 def main():
     log_file = os.path.splitext(os.path.basename(__file__))[0] + '.log'
     logging.basicConfig(filename=log_file, level=logging.INFO, filemode='w', format='%(asctime)s %(message)s')
